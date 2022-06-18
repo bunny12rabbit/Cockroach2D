@@ -1,0 +1,16 @@
+{
+    "name": "Logs",
+    "rootNamespace": "",
+    "references": [
+        "GUID:db0dca8236536ea4980feea395bb7b13"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

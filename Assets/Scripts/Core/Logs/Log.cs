@@ -22,7 +22,7 @@ namespace Core.Logs
                 if (condition)
                     return false;
 
-                Log.AssertionLog("Assertion failed!", context, tag);
+                AssertionLog("Assertion failed!", context, tag);
                 return true;
             }
 
@@ -33,7 +33,7 @@ namespace Core.Logs
                 if (obj != null)
                     return false;
 
-                Log.AssertionLog($"{nameof(obj)} is null!", context, tag);
+                AssertionLog($"{nameof(obj)} is null!", context, tag);
                 return true;
             }
 
@@ -44,7 +44,7 @@ namespace Core.Logs
                 if (obj == null)
                     return false;
 
-                Log.AssertionLog($"{nameof(obj)} is not null!", context, tag);
+                AssertionLog($"{nameof(obj)} is not null!", context, tag);
                 return true;
             }
 
@@ -54,13 +54,13 @@ namespace Core.Logs
             {
                 if (enumerable == null)
                 {
-                    Log.AssertionLog($"{nameof(enumerable)} is null!", context, tag);
+                    AssertionLog($"{nameof(enumerable)} is null!", context, tag);
                     return true;
                 }
 
                 if (enumerable.IsEmpty())
                 {
-                    Log.AssertionLog($"{nameof(enumerable)} is empty!", context, tag);
+                    AssertionLog($"{nameof(enumerable)} is empty!", context, tag);
                     return true;
                 }
 
@@ -101,7 +101,7 @@ namespace Core.Logs
 
 
         [DebuggerHidden, Conditional("UNITY_ASSERTIONS")]
-        internal static void AssertionLog(string message, Object context, string tag = "") =>
+        private static void AssertionLog(string message, Object context, string tag = "") =>
             s_logger.PrettyLog(LogType.Assert, message, context, tag);
     }
 }
