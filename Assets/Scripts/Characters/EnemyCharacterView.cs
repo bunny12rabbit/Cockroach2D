@@ -65,6 +65,12 @@ namespace Characters
             Observable.EveryUpdate().Subscribe(Tick).AddTo(Disposables);
         }
 
+        public override void Dispose()
+        {
+            _availableStates.Clear();
+            base.Dispose();
+        }
+
         private void CalculateViewSize()
         {
             if (Log.Assert.IsNotNull(_renderer))

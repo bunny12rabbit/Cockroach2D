@@ -27,5 +27,7 @@ namespace Characters
             _runAwayAccelerationDelta = runAwayAccelerationDelta;
             _accelerationCurve = AnimationCurve.EaseInOut(0f, 0f, 2f, 1f);
         }
+
+        public void SetNormalSpeed(float value) => _normalSpeed = value;
     }
 }

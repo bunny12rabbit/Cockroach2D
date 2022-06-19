@@ -14,5 +14,7 @@ namespace Common.Settings
         [SerializeField, BoxGroup(EnemySettingsLabel)]
         private CharacterData _characterData = CharacterData.Default;
         public CharacterData CharacterData => _characterData;
+
+        public void SetCharacterData(CharacterData data) => _characterData = data;
     }
 }

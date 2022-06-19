@@ -1,5 +1,6 @@
 ﻿using Characters;
 using Common.Settings;
+using Common.UI;
 using Core;
 using Core.Logs;
 using Extensions;
@@ -35,6 +36,9 @@ namespace Common
         [SerializeField, Required]
         private DangerDetector _dangerDetector;
 
+        [SerializeField, Required]
+        private UIManager _uiManager;
+
         private readonly CompositeDisposable _disposables = new();
 
         private CharacterSpawner _characterSpawner;
@@ -60,7 +64,16 @@ namespace Common
             Log.Assert.IsNotNull(_gameDesignSettings);
             Log.Assert.IsNotNull(_camera);
 
-            _dangerDetector.Init(new DangerDetector.Params(_camera));
+            _dangerDetector.gameObject.SetActive(false);
+
+            _uiManager.Init(new UIManager.Params(_prefabPool, _gameDesignSettings, _dangerDetector)).AddTo(_disposables);
+            _uiManager.StartButtonClicked.Subscribe(_ => StartGame()).AddTo(_disposables);
+        }
+
+        private void StartGame()
+        {
+            _dangerDetector.gameObject.SetActive(true);
+            _dangerDetector.Init(new DangerDetector.Params(_camera)).AddTo(_disposables);
 
             var screenBorders = new Boundaries(_camera, Screen.width, Screen.height);
 
@@ -68,16 +81,23 @@ namespace Common
                 new CharacterSpawner.Params(_prefabPool, _dangerDetector, screenBorders, _finishPoint.position, _startPoint.position);
 
             _characterSpawner = new CharacterSpawner(characterSpawnerParams).AddTo(_disposables);
+
             var enemyCharacterView = _characterSpawner.Spawn(_enemyCharacterViewPrefab, _gameDesignSettings.CharacterData);
-            enemyCharacterView.TargetReached.Subscribe(OnTargetReached).AddTo(_disposables);
+            enemyCharacterView.TargetReached.Subscribe(OnTargetReached).AddTo(enemyCharacterView.Disposables);
         }
 
         private void OnTargetReached(Unit _)
         {
-            Log.Info($"GameOver!".Colorize(Color.green));
+            _uiManager.ShowGameOverWindow().First().Subscribe(_ => RestartGame());
         }
 
-        private void OnDisable()
+        private void RestartGame()
+        {
+            _characterSpawner.Dispose();
+            StartGame();
+        }
+
+        private void OnDestroy()
         {
             _disposables.Clear();
         }

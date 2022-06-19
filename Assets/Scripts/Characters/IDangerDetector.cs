@@ -2,7 +2,7 @@
 
 namespace Characters
 {
-    public interface IDangerDetector
+    public interface IDangerDetector : IDangerDetectorData
     {
         bool IsWithinDangerArea(Vector3 position);
     }

@@ -35,11 +35,14 @@ namespace Core
                 enabled = false; // Чтобы не добавлять в каждом наследнике проверки на инициализацию в Update/FixedUpdate.
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             _disposables.Clear();
             InputParams = default;
-            enabled = false;
+
+            if (!Equals(null))
+                enabled = false;
+
             _isInitialized = false;
 
             DisposeUtils.InvokeAndSetNull(ref _onDispose);

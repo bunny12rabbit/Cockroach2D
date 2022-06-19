@@ -24,6 +24,10 @@ namespace Characters
         [SerializeField]
         private float _dangerRadius = 1.2f;
 
+        private readonly ReactiveProperty<float> _radius = new();
+
+        public IReactiveProperty<float> Radius => _radius;
+
         private Camera Camera => InputParams.Camera;
 
         private Vector3 MouseWorldPosition
@@ -52,6 +56,16 @@ namespace Characters
 
         protected override void Init()
         {
+            _radius.Value = _dangerRadius;
+
+            _radius
+                .Subscribe(newValue =>
+                {
+                    _dangerRadius = newValue;
+                    TrySetVisualSize();
+                })
+                .AddTo(Disposables);
+
             TrySetVisualSize();
             Observable.EveryUpdate().Subscribe(Tick).AddTo(Disposables);
         }
@@ -59,6 +73,12 @@ namespace Characters
         private void Tick(long _)
         {
             transform.position = MouseWorldPosition;
+            UpdateRadiusProperty();
+        }
+
+        private void UpdateRadiusProperty()
+        {
+            _radius.Value = _dangerRadius;
         }
 
         public bool IsWithinDangerArea(Vector3 position) => Vector3.Distance(MouseWorldPosition, position) <= _dangerRadius;
