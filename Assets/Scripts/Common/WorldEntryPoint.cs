@@ -100,9 +100,6 @@ namespace Common
                 .First()
                 .Subscribe(OnTargetReached)
                 .AddTo(_spawnedEnemiesDisposables);
-
-            /*foreach (var enemyCharacterView in enemyCharacterViews)
-                enemyCharacterView.TargetReached.Subscribe(OnTargetReached).AddTo(enemyCharacterView.Disposables);*/
         }
 
         private void OnTargetReached(Unit _)
