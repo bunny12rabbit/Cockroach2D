@@ -94,7 +94,7 @@ namespace Characters
             var checkForDangerState = new CheckForDangerState(_stateMachine, _availableStates, DangerDetector, thisTransform);
 
             var runAwayState = new RunAwayState(_stateMachine, _availableStates, thisTransform, Boundaries, _viewSize,
-                CharacterData.NormalSpeed, CharacterData.RunAwayAccelerationDelta);
+                CharacterData.NormalSpeed, CharacterData.RunAwayAccelerationPerSecondDelta);
 
             _availableStates.Add(initialAccelerationState.Name, initialAccelerationState);
             _availableStates.Add(walkToTargetState.Name, walkToTargetState);

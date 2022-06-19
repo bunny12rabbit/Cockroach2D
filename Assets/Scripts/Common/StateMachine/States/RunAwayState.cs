@@ -80,7 +80,7 @@ namespace Common.StateMachine.States
             if (IsBordersIntersected)
                 FindNewRandomDirection();
 
-            _speed += _accelerationDelta;
+            _speed += _accelerationDelta * Time.deltaTime;
             ((IMotor) this).Move(_direction, _speed);
         }
 

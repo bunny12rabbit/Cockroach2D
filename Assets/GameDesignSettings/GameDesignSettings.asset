@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: GameDesignSettings
   m_EditorClassIdentifier: 
   _characterData:
-    _normalSpeed: 5
-    _runAwayAccelerationDelta: 0.05
+    _normalSpeed: 10
+    _runAwayAccelerationPerSecondDelta: 10
     _accelerationCurve:
       serializedVersion: 2
       m_Curve:
