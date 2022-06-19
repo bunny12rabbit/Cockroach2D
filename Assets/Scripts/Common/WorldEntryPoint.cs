@@ -1,4 +1,5 @@
-﻿using Characters;
+﻿using System.Linq;
+using Characters;
 using Common.Settings;
 using Common.UI;
 using Core;
@@ -12,37 +13,45 @@ namespace Common
 {
     public class WorldEntryPoint : MonoBehaviour
     {
-        private const string EnemyLabel = "Enemy Label";
+        private const string EnemyLabel = "Enemy";
         private const string SceneObjectsLabel = "Scene Objects";
+
+        [SerializeField, Required, BoxGroup(SceneObjectsLabel)]
+        private PrefabPool _prefabPool;
+
+        [SerializeField, Required, BoxGroup(SceneObjectsLabel)]
+        private Camera _camera;
+
+        [SerializeField, Required, BoxGroup(SceneObjectsLabel)]
+        private UIManager _uiManager;
+
+        [SerializeField, Required, BoxGroup(SceneObjectsLabel)]
+        private DangerDetector _dangerDetector;
+
+        [SerializeField, ValidateInput(nameof(ValidateIsNotEmpty), "Should contains at least 1 element"), BoxGroup(EnemyLabel)]
+        private Transform[] _startPoints;
+
+        [SerializeField, Required, BoxGroup(EnemyLabel)]
+        private Transform _finishPoint;
+
+        [SerializeField, BoxGroup(EnemyLabel)]
+        private int _enemiesAmount = 1;
+
+        [SerializeField, Required, BoxGroup(EnemyLabel)]
+        private EnemyCharacterView _enemyCharacterViewPrefab;
 
         [SerializeField, Required]
         private GameDesignSettings _gameDesignSettings;
 
-        [SerializeField, BoxGroup(EnemyLabel)]
-        private Transform _startPoint;
-
-        [SerializeField, BoxGroup(EnemyLabel)]
-        private Transform _finishPoint;
-
-        [SerializeField, BoxGroup(SceneObjectsLabel)]
-        private PrefabPool _prefabPool;
-
-        [SerializeField, Required]
-        private Camera _camera;
-
-        [SerializeField, Required]
-        private EnemyCharacterView _enemyCharacterViewPrefab;
-
-        [SerializeField, Required]
-        private DangerDetector _dangerDetector;
-
-        [SerializeField, Required]
-        private UIManager _uiManager;
-
         private readonly CompositeDisposable _disposables = new();
+        private readonly CompositeDisposable _spawnedEnemiesDisposables = new();
 
         private CharacterSpawner _characterSpawner;
 
+        private Vector3[] StartPositions => _startPoints?.Select(point => point.position).ToArray() ?? Empty.Array<Vector3>();
+
+
+        private bool ValidateIsNotEmpty(Transform[] transforms) => !transforms.IsNullOrEmpty();
 
         private void OnValidate()
         {
@@ -78,12 +87,22 @@ namespace Common
             var screenBorders = new Boundaries(_camera, Screen.width, Screen.height);
 
             var characterSpawnerParams =
-                new CharacterSpawner.Params(_prefabPool, _dangerDetector, screenBorders, _finishPoint.position, _startPoint.position);
+                new CharacterSpawner.Params(_prefabPool, _dangerDetector, screenBorders, _finishPoint.position, StartPositions);
 
             _characterSpawner = new CharacterSpawner(characterSpawnerParams).AddTo(_disposables);
 
-            var enemyCharacterView = _characterSpawner.Spawn(_enemyCharacterViewPrefab, _gameDesignSettings.CharacterData);
-            enemyCharacterView.TargetReached.Subscribe(OnTargetReached).AddTo(enemyCharacterView.Disposables);
+            var enemyCharacterViews =
+                _characterSpawner.SpawnEnemy(_enemyCharacterViewPrefab, _gameDesignSettings.CharacterData, _enemiesAmount);
+
+            enemyCharacterViews
+                .Select(enemy => enemy.TargetReached)
+                .Merge()
+                .First()
+                .Subscribe(OnTargetReached)
+                .AddTo(_spawnedEnemiesDisposables);
+
+            /*foreach (var enemyCharacterView in enemyCharacterViews)
+                enemyCharacterView.TargetReached.Subscribe(OnTargetReached).AddTo(enemyCharacterView.Disposables);*/
         }
 
         private void OnTargetReached(Unit _)
@@ -93,13 +112,9 @@ namespace Common
 
         private void RestartGame()
         {
+            _spawnedEnemiesDisposables.Clear();
             _characterSpawner.Dispose();
             StartGame();
-        }
-
-        private void OnDestroy()
-        {
-            _disposables.Clear();
         }
     }
 }

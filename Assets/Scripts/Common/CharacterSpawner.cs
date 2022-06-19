@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Characters;
 using Core;
 using UniRx;
@@ -41,21 +43,47 @@ namespace Common
 
         private readonly CompositeDisposable _disposables = new();
 
+        private int _previousSpawnPositionIndex = -1;
+
         public void Dispose()
         {
             _disposables.Clear();
         }
 
-        public EnemyCharacterView Spawn(EnemyCharacterView prefab, CharacterData characterData)
+        public ICollection<EnemyCharacterView> SpawnEnemy(EnemyCharacterView prefab, CharacterData characterData, int amount = 1)
         {
-            var randomIndex = Random.Range(0, _params.SpawnPositions.Length);
-            var spawnPosition = _params.SpawnPositions[randomIndex];
-            var targetPosition = _params.TargetPosition;
-            var characterParams = new EnemyCharacterView.Params(_params.DangerDetector, characterData, _params.Boundaries, targetPosition);
+            var spawnedEnemies = new List<EnemyCharacterView>();
 
-            var enemyCharacter = _params.PrefabPool.Get(prefab, characterParams).AddTo(_disposables);
-            enemyCharacter.transform.position = spawnPosition;
-            return enemyCharacter;
+            for (var i = 0; i < amount; i++)
+            {
+                var spawnPosition = GetRandomSpawnPoint();
+                var targetPosition = _params.TargetPosition;
+                var characterParams = new EnemyCharacterView.Params(_params.DangerDetector, characterData, _params.Boundaries, targetPosition);
+
+                var enemyCharacter = _params.PrefabPool.Get(prefab, characterParams).AddTo(_disposables);
+                enemyCharacter.transform.position = spawnPosition;
+                spawnedEnemies.Add(enemyCharacter);
+            }
+
+            return spawnedEnemies;
+        }
+
+        private Vector3 GetRandomSpawnPoint()
+        {
+            if (_params.SpawnPositions.Length == 1)
+                return _params.SpawnPositions.First();
+
+            int randomIndex;
+
+            do
+            {
+                randomIndex = Random.Range(0, _params.SpawnPositions.Length);
+            }
+            while (randomIndex == _previousSpawnPositionIndex);
+
+            _previousSpawnPositionIndex = randomIndex;
+
+            return _params.SpawnPositions[randomIndex];
         }
     }
 }

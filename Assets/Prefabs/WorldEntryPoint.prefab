@@ -134,14 +134,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05b91498ffa3400c84da401e31fcea13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gameDesignSettings: {fileID: 11400000, guid: a8d5e2c97dda9e340b220515d6ff6453, type: 2}
-  _startPoint: {fileID: 3257495370743523388}
-  _finishPoint: {fileID: 6579958753365783214}
   _prefabPool: {fileID: 6966268266970873273}
   _camera: {fileID: 9108294462333737858}
-  _enemyCharacterViewPrefab: {fileID: 5993756335871266264, guid: 502bdf3880bab754ca62122a2f24f16f, type: 3}
-  _dangerDetector: {fileID: 6261413002663647050}
   _uiManager: {fileID: 684096570861782095}
+  _dangerDetector: {fileID: 6261413002663647050}
+  _startPoints:
+  - {fileID: 3257495370743523388}
+  _finishPoint: {fileID: 6579958753365783214}
+  _enemiesAmount: 1
+  _enemyCharacterViewPrefab: {fileID: 5993756335871266264, guid: 502bdf3880bab754ca62122a2f24f16f, type: 3}
+  _gameDesignSettings: {fileID: 11400000, guid: a8d5e2c97dda9e340b220515d6ff6453, type: 2}
 --- !u!1 &6966268266970873270
 GameObject:
   m_ObjectHideFlags: 0
@@ -400,6 +402,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2195992505538815196, guid: 97860a7d282809a4da144ba747233bba, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5134465419814457921, guid: 97860a7d282809a4da144ba747233bba, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5134465419814457921, guid: 97860a7d282809a4da144ba747233bba, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
