@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Extensions;
+using UniRx;
 
 namespace Common.StateMachine.States
 {
@@ -13,6 +14,9 @@ namespace Common.StateMachine.States
         protected readonly StateMachine stateMachine;
 
         protected readonly IReadOnlyDictionary<string, State> availableStates;
+
+        protected readonly ReactiveCommand stateFinished = new();
+        public virtual IObservable<Unit> StateFinished => stateFinished;
 
         protected State(string name, StateMachine stateMachine, IReadOnlyDictionary<string, State> availableStates)
         {
@@ -31,6 +35,7 @@ namespace Common.StateMachine.States
 
         public virtual void Exit()
         {
+            stateFinished.Execute();
             ResetState();
         }
 

@@ -41,11 +41,19 @@ namespace Common.StateMachine.States
         public override void OnUpdate()
         {
             if (IsFinishPointReached)
+            {
+                stateFinished.Execute();
+                stateMachine.ChangeState(Empty);
                 return;
+            }
 
             ((IMotor) this).Move(_direction, _speed);
 
             stateMachine.ChangeState(TryGetState(CheckForDangerStateName));
+        }
+
+        public override void Exit()
+        {
         }
 
         void IMotor.Move(Vector3 direction, float speed)

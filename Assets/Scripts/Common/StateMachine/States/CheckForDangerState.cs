@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using Characters;
-using Core.Logs;
-using Extensions;
 using UnityEngine;
 
 namespace Common.StateMachine.States
@@ -15,7 +13,8 @@ namespace Common.StateMachine.States
 
         private readonly Transform _transform;
 
-        public CheckForDangerState(StateMachine stateMachine, IReadOnlyDictionary<string, State> availableStates, IDangerDetector dangerDetector,
+        public CheckForDangerState(StateMachine stateMachine, IReadOnlyDictionary<string, State> availableStates,
+            IDangerDetector dangerDetector,
             Transform transform) :
             base(nameof(CheckForDangerState), stateMachine, availableStates)
         {
@@ -25,15 +24,9 @@ namespace Common.StateMachine.States
 
         public override void Enter()
         {
-            if (_dangerDetector.IsWithinDangerArea(_transform.position))
-            {
-                Log.Info("Danger!".Colorize(Color.red));
-                stateMachine.ChangeState(TryGetState(RunAwayStateName));
-            }
-            else
-            {
-                stateMachine.ChangeState(TryGetState(WalkToTargetStateName));
-            }
+            stateMachine.ChangeState(_dangerDetector.IsWithinDangerArea(_transform.position)
+                ? TryGetState(RunAwayStateName)
+                : TryGetState(WalkToTargetStateName));
         }
     }
 }

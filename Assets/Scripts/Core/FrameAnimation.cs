@@ -1,5 +1,4 @@
 ﻿using System;
-using Core.Logs;
 using Extensions;
 using NaughtyAttributes;
 using UniRx;
@@ -8,7 +7,7 @@ using Utils;
 
 namespace Core
 {
-    public class FrameAnimation : MonoBehaviour
+    public class FrameAnimation : MonoBehaviour, IDisposable
     {
         [SerializeField, Min(0f)]
         private float _frameDuration = 1f;
@@ -34,15 +33,19 @@ namespace Core
 
         private void OnDisable()
         {
-            DisposeUtils.DisposeAndSetNull(ref _disposable);
+            Dispose();
         }
 
-        public void Play()
+        /// <summary>
+        /// Plays frame animation
+        /// </summary>
+        /// <returns>IDisposable that can be disposed in order to Stop animation</returns>
+        public IDisposable Play()
         {
             DisposeUtils.DisposeAndSetNull(ref _disposable);
 
             if (_frames.IsNullOrEmpty())
-                return;
+                return Disposable.Empty;
 
             _currentFrame = 0;
 
@@ -51,12 +54,11 @@ namespace Core
 
             _disposable = Observable.Interval(TimeSpan.FromSeconds(_frameDuration)).Subscribe(_ => SwitchFrames());
             SwitchFrames();
+            return _disposable;
         }
 
         private void SwitchFrames()
         {
-            Log.Info($"currentIndex: {_currentFrame}");
-
             _frames[_currentFrame].SetActive(true);
 
             if (_currentFrame > 0)
@@ -65,6 +67,11 @@ namespace Core
                 _frames[^1].SetActive(false);
 
             _currentFrame = (_currentFrame + 1) % _frames.Length;
+        }
+
+        public void Dispose()
+        {
+            DisposeUtils.DisposeAndSetNull(ref _disposable);
         }
     }
 }
