@@ -19,11 +19,14 @@ namespace Common.UI
 
             public readonly float InitialValue;
 
-            public Params(string label, Vector2 sliderRange, float initialValue)
+            public readonly bool UseWholeNumbers;
+
+            public Params(string label, Vector2 sliderRange, float initialValue, bool useWholeNumbers = false)
             {
                 Label = label;
-                InitialValue = initialValue;
                 SliderRange = sliderRange;
+                InitialValue = initialValue;
+                UseWholeNumbers = useWholeNumbers;
             }
         }
 
@@ -62,6 +65,7 @@ namespace Common.UI
 
             _label.text = InputParams.Label;
 
+            _slider.wholeNumbers = InputParams.UseWholeNumbers;
             _slider.minValue = InputParams.SliderRange.x;
             _slider.maxValue = InputParams.SliderRange.y;
             _slider.value = InputParams.InitialValue;

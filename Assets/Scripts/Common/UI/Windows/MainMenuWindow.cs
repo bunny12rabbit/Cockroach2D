@@ -24,6 +24,9 @@ namespace Common.UI.Windows
         [SerializeField, Required]
         private SliderWithLabel _enemyCharacterSpeedSlider;
 
+        [SerializeField, Required]
+        private SliderWithLabel _enemiesAmountSlider;
+
         private GameDesignSettings GameDesignSettings => InputParams.GameDesignSettings;
 
         protected override void Init()
@@ -34,6 +37,7 @@ namespace Common.UI.Windows
                 return;
 
             SetupEnemySpeedSlider();
+            SetupEnemiesAmountSlider();
         }
 
         private void SetupEnemySpeedSlider()
@@ -45,11 +49,25 @@ namespace Common.UI.Windows
             _enemyCharacterSpeedSlider.ValueChanged.Subscribe(OnEnemySpeedSliderValueChanged).AddTo(Disposables);
         }
 
+        private void SetupEnemiesAmountSlider()
+        {
+            _enemiesAmountSlider.Init(
+                    new SliderWithLabel.Params("Enemies Amount", new Vector2(1, 3), GameDesignSettings.EnemiesAmount, true))
+                .AddTo(Disposables);
+
+            _enemiesAmountSlider.ValueChanged.Subscribe(OnEnemiesAmountSliderValueChanged).AddTo(Disposables);
+        }
+
         private void OnEnemySpeedSliderValueChanged(float value)
         {
             var characterData = GameDesignSettings.CharacterData;
             characterData.SetNormalSpeed(value);
             GameDesignSettings.SetCharacterData(characterData);
+        }
+
+        private void OnEnemiesAmountSliderValueChanged(float value)
+        {
+            GameDesignSettings.EnemiesAmount = Mathf.FloorToInt(value);
         }
     }
 }

@@ -34,9 +34,6 @@ namespace Common
         [SerializeField, Required, BoxGroup(EnemyLabel)]
         private Transform _finishPoint;
 
-        [SerializeField, BoxGroup(EnemyLabel)]
-        private int _enemiesAmount = 1;
-
         [SerializeField, Required, BoxGroup(EnemyLabel)]
         private EnemyCharacterView _enemyCharacterViewPrefab;
 
@@ -92,7 +89,7 @@ namespace Common
             _characterSpawner = new CharacterSpawner(characterSpawnerParams).AddTo(_disposables);
 
             var enemyCharacterViews =
-                _characterSpawner.SpawnEnemy(_enemyCharacterViewPrefab, _gameDesignSettings.CharacterData, _enemiesAmount);
+                _characterSpawner.SpawnEnemy(_enemyCharacterViewPrefab, _gameDesignSettings.CharacterData, _gameDesignSettings.EnemiesAmount);
 
             enemyCharacterViews
                 .Select(enemy => enemy.TargetReached)
