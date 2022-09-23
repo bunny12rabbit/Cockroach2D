@@ -1,35 +1,71 @@
-﻿using System.Collections.Generic;
-using Core;
-using Core.Logs;
-using Extensions;
+﻿using System.Linq;
 using UnityEngine;
 
 namespace Common
 {
-    public class RandomWeighed
+    public static class RandomWeighed
     {
-        private int CalculateCDFWeightedIndexIn(ICollection<int> weights)
+        public static int GetRandomWeightedIndex(int[] weights)
         {
-            var cdf = weights.ComputeCumulativeDensityFunction(out var sumOfWeights);
-            var random = Random.Range(0, sumOfWeights + 1);
-            Log.Info($"SumOfWeights: {sumOfWeights}, random: {random}");
+            // Get the total sum of all the weights.
+            var weightSum = weights.Sum();
 
-            var intResultIndex = cdf.FindClosestIndexWithBinarySearch(random);
-            Log.Info($"IntResultIndex: {intResultIndex}".Colorize(Color.green));
+            // Step through all the possibilities, one by one, checking to see if each one is selected.
+            var index = 0;
+            var lastIndex = weights.Length - 1;
 
-            return intResultIndex;
+            while (index < lastIndex)
+            {
+                // Do a probability check with a likelihood of weights[index] / weightSum.
+                var random = Random.Range(0, weightSum);
+
+                if (random < weights[index])
+                    return index;
+
+                // Remove the last item from the sum of total untested weights and try again.
+                weightSum -= weights[index++];
+            }
+
+            // No other item was selected, so return very last index.
+            return index;
         }
 
-        private int CalculateCDFWeightedIndexIn(ICollection<float> weights)
+        public static int GetRandomWeightedIndex(float[] weights)
         {
-            var cdfFloat = weights.ComputeCumulativeDensityFunction(out var sumOfWeightsFloat);
-            var randomFloat = Random.Range(0, sumOfWeightsFloat);
-            Log.Info($"SumOfWeightsFloat: {sumOfWeightsFloat}, randomFloat: {randomFloat}");
+            if (weights == null || weights.Length == 0)
+                return -1;
 
-            var floatResultIndex = cdfFloat.FindClosestIndexWithBinarySearch(randomFloat);
-            Log.Info($"FloatResultIndex: {floatResultIndex}".Colorize(Color.green));
+            float weight;
+            float weightsSum = 0;
 
-            return floatResultIndex;
+            for (var i = 0; i < weights.Length; i++)
+            {
+                weight = weights[i];
+
+                if (float.IsPositiveInfinity(weight))
+                    return i;
+
+                if (weight >= 0f && !float.IsNaN(weight))
+                    weightsSum += weights[i];
+            }
+
+            var random = Random.value;
+            var sum = 0f;
+
+            for (var i = 0; i < weights.Length; i++)
+            {
+                weight = weights[i];
+
+                if (float.IsNaN(weight) || weight <= 0f)
+                    continue;
+
+                sum += weight / weightsSum;
+
+                if (sum >= random)
+                    return i;
+            }
+
+            return -1;
         }
     }
 }
